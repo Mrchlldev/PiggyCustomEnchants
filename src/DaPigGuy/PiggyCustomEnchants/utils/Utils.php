@@ -178,7 +178,13 @@ class Utils
     public static function displayEnchants(ItemStack $itemStack): ItemStack
     {
         $plugin = CustomEnchantManager::getPlugin();
-        $item = TypeConverter::getInstance()->netItemStackToCore($itemStack);
+        if ($itemStack->getBlockRuntimeId() !== 0) {
+            return $itemStack;
+        }
+        try {
+            $item = TypeConverter::getInstance()->netItemStackToCore($itemStack);
+        } catch (\Exception) {
+            return $itemStack;
         if (count($item->getEnchantments()) > 0) {
             $additionalInformation = $plugin->getConfig()->getNested("enchants.position") === "name" ? TextFormat::RESET . TextFormat::WHITE . $item->getName() : "";
             foreach ($item->getEnchantments() as $enchantmentInstance) {
