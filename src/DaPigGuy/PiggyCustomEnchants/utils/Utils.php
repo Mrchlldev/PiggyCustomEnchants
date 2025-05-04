@@ -185,6 +185,7 @@ class Utils
             $item = TypeConverter::getInstance()->netItemStackToCore($itemStack);
         } catch (\Exception) {
             return $itemStack;
+        }
         if (count($item->getEnchantments()) > 0) {
             $additionalInformation = $plugin->getConfig()->getNested("enchants.position") === "name" ? TextFormat::RESET . TextFormat::WHITE . $item->getName() : "";
             foreach ($item->getEnchantments() as $enchantmentInstance) {
@@ -208,7 +209,14 @@ class Utils
 
     public static function filterDisplayedEnchants(ItemStack $itemStack): ItemStack
     {
-        $item = TypeConverter::getInstance()->netItemStackToCore($itemStack);
+        if ($itemStack->getBlockRuntimeId() !== 0) {
+            return $itemStack;
+        }
+        try {
+            $item = TypeConverter::getInstance()->netItemStackToCore($itemStack);
+        } catch (\Exception) {
+            return $itemStack;
+        }
         $tag = $item->getNamedTag();
         if (count($item->getEnchantments()) > 0) $tag->removeTag(Item::TAG_DISPLAY);
         if ($tag->getTag("OriginalDisplayTag") instanceof CompoundTag) {
